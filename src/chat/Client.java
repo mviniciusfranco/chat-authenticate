@@ -61,10 +61,18 @@ public class Client {
 
     public static void main(String[] args) throws IOException, ClassNotFoundException {
 
+        BufferedReader str = new BufferedReader(new InputStreamReader(System.in));
+        
         try {
+            System.out.println("Digite o IP do servidor");
             String message;
-            InetAddress address = InetAddress.getByName("127.0.0.1");
-            Socket cliente = new Socket(address, 5555);
+            message = str.readLine();
+            InetAddress address = InetAddress.getByName(message);
+            
+            System.out.println("Digite a porta do servidor");
+            Integer porta = Integer.parseInt(str.readLine());
+            
+            Socket cliente = new Socket(address, porta);
 
             System.out.println("Cliente conectado");
 
@@ -93,9 +101,6 @@ public class Client {
                     "Login feito com sucesso!");
             System.out.println(
                     "Enviando mensagens...");
-            
-            
-            
             
             while (!msgout.equals(
                     "end")) {

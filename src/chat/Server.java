@@ -6,6 +6,7 @@
 package chat;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.File;
@@ -13,6 +14,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.ObjectOutputStream;
@@ -31,13 +33,16 @@ import javax.crypto.spec.SecretKeySpec;
  */
 public class Server {
 
-    static int port = 5555;
-
     public static void main(String[] args) throws IOException {
+
+        BufferedReader str = new BufferedReader(new InputStreamReader(System.in));
+
         try {
 
-            ServerSocket server = new ServerSocket(port);
             System.out.println("Servidor iniciado ");
+            System.out.println("Digite a porta a ser escutada");
+            Integer porta = Integer.parseInt(str.readLine());
+            ServerSocket server = new ServerSocket(porta);
 
             Socket cliente = server.accept();
             System.out.println("Cliente conectado: " + cliente.getInetAddress());
@@ -58,7 +63,7 @@ public class Server {
             String line = brFileReader.readLine();
 
             while (true) {
-                
+
                 if (line == null) {
                     System.out.println("Senha digitada incorreta");
                     fl.getChannel().position(0);
@@ -87,32 +92,36 @@ public class Server {
 //                //out.writeUTF(msgout);
 //                //out.flush();
 //            }
-            
+            File log = new File("log.txt");
+
+            BufferedWriter outLog = new BufferedWriter(new FileWriter(log, true));
+
             while (!msgin.equals("end")) {
                 //recebe mensagens
 
                 int length = in.readInt();
 
                 byte[] message = new byte[length];
-                
+
                 if (length > 0) {
                     message = new byte[length];
                     in.readFully(message, 0, message.length); // read the message
                 }
 
-                //msgin = in.readUTF();
                 String decodedtext = new TripleDESTest().decrypt(message);
-
                 
-
+                
                 if (!decodedtext.equals("end")) {
                     System.out.println(decodedtext);
+                    outLog.write(decodedtext);
+                    outLog.newLine();
+                    outLog.flush();
                 }
                 //msgout = br.readLine();
                 //out.writeUTF(msgout);
                 //out.flush();
             }
-            
+            outLog.close();
             out.writeUTF("end");
             out.flush();
             cliente.close();
